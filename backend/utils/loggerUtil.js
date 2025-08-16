@@ -5,7 +5,7 @@ import winston from 'winston';
 const { format, transports } = winston;
 
 // Ensure logs directory exists
-const logDir = path.join(path.dirname(__dirname), 'logs');
+const logDir = path.join(path.dirname(import.meta.dirname), 'logs');
 if (!fs.existsSync(logDir)) {
     fs.mkdirSync(logDir);
 }
