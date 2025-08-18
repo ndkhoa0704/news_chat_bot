@@ -1,7 +1,4 @@
-import currentTime from './currentTime';
-import webSearch from './webSearch';
+import currentTime from './currentTime.js';
+import webSearch from './webSearch.js';
 
-export default {
-    currentTime,
-    webSearch
-}
+export default [currentTime, webSearch]

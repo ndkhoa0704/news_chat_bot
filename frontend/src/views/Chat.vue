@@ -41,13 +41,54 @@ async function sendMessage() {
   error.value = ''
   const msg = input.value
   input.value = ''
+  const headers = { ...authHeaders(), 'Content-Type': 'application/json' }
+  const controller = new AbortController()
   try {
-    const { data } = await axios.post(`/api/chat/conversations/${selectedId.value}/messages`, { message: msg }, { headers: authHeaders() })
-    messages.value.push({ userMsg: msg, botMsg: data.botMsg })
+    // Optimistically add a placeholder for streaming bot reply
+    messages.value.push({ userMsg: msg, botMsg: '' })
+    const idx = messages.value.length - 1
+    const resp = await fetch(`/api/chat/conversations/${selectedId.value}/messages`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ message: msg }),
+      signal: controller.signal,
+    })
+    if (!resp.ok) {
+      throw new Error('Request failed')
+    }
+    const reader = resp.body.getReader()
+    const decoder = new TextDecoder('utf-8')
+    let buffer = ''
+    while (true) {
+      const { value, done } = await reader.read()
+      if (done) break
+      buffer += decoder.decode(value, { stream: true })
+      const parts = buffer.split('\n\n')
+      buffer = parts.pop() || ''
+      for (const part of parts) {
+        if (!part.startsWith('data: ')) continue
+        const json = part.slice(6)
+        if (json === '[DONE]') continue
+        try {
+          const evt = JSON.parse(json)
+          if (evt.delta) {
+            messages.value[idx].botMsg += evt.delta
+          } else if (evt.event === 'end') {
+            // server will persist; reload list/title lazily
+          } else if (evt.event === 'error') {
+            throw new Error(evt.message || 'Generation error')
+          }
+        } catch {
+          // ignore malformed chunk
+        }
+      }
+    }
   } catch (e) {
-    error.value = e?.response?.data?.message || 'Failed to send message'
+    error.value = e?.message || 'Failed to send message'
   } finally {
     loading.value = false
+    // refresh conversations to get updated summary/title
+    try { await loadConversations() } catch {}
   }
 }
 

@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-import { config } from '../config.js'
+import config from '../config.js'
 import { User } from '../models/userModel.js'
 
 
@@ -9,7 +9,7 @@ function AuthService() {
     return {
         // Token utilities
         createToken: (payload) => jwt.sign(payload, config.JWT_SECRET, { expiresIn: config.JWT_EXPIRES_IN }),
-        
+
         verifyToken: (token) => {
             try {
                 return jwt.verify(token, config.JWT_SECRET)
@@ -30,7 +30,7 @@ function AuthService() {
         // Registration logic
         registerUser: async (userData) => {
             const { userName, email, password } = userData
-            
+
             if (!email || !password || !userName) {
                 throw new Error('Missing required fields')
             }
@@ -55,7 +55,7 @@ function AuthService() {
         // Login logic
         loginUser: async (credentials) => {
             const { email, password } = credentials
-            
+
             if (!email || !password) {
                 throw new Error('Missing required fields')
             }
@@ -79,11 +79,11 @@ function AuthService() {
             if (!userEmail) {
                 throw new Error('User email not found')
             }
-            
+
             if (!config.ADMIN_EMAILS.includes(userEmail)) {
                 throw new Error('Admin permission required')
             }
-            
+
             return true
         },
 
@@ -94,7 +94,7 @@ function AuthService() {
 
         createNewUser: async (userData) => {
             const { userName, email, password } = userData
-            
+
             if (!email || !password || !userName) {
                 throw new Error('Missing required fields')
             }
@@ -105,13 +105,13 @@ function AuthService() {
             }
 
             const hashed = await bcrypt.hash(password, 10)
-            const user = await User.create({ 
-                userId: randomUUID(), 
-                userName, 
-                email, 
-                password: hashed 
+            const user = await User.create({
+                userId: randomUUID(),
+                userName,
+                email,
+                password: hashed
             })
-            
+
             return this.sanitizeUser(user)
         },
 

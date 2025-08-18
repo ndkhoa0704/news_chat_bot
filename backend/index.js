@@ -3,7 +3,7 @@ import express from "express";
 import helmet from "helmet";
 import mongoose from "mongoose";
 import morgan from "morgan";
-import { config } from "./config.js";
+import config from "./config.js";
 import authRouter from "./routes/authRoutes.js";
 import chatRouter from "./routes/chatRoutes.js";
 
@@ -18,7 +18,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/chat", chatRouter);
 
 mongoose
-    .connect(config.DB_URL)
+    .connect(config.MONGO_URL)
     .then(() => {
         app.listen(config.WEB_PORT, (err) => {
             console.log("Connected to MongoDB");
