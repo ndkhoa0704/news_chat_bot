@@ -3,7 +3,6 @@ import config from '../config.js'
 import tools from '../tools/index.js'
 
 
-
 function ChatService() {
     const SELF = {
         client: (() => {
