@@ -1,18 +1,17 @@
 import { randomUUID } from 'node:crypto'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-import config from '../config.js'
 import { User } from '../models/userModel.js'
 
 
 function AuthService() {
     return {
         // Token utilities
-        createToken: (payload) => jwt.sign(payload, config.JWT_SECRET, { expiresIn: config.JWT_EXPIRES_IN }),
+        createToken: (payload) => jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN }),
 
         verifyToken: (token) => {
             try {
-                return jwt.verify(token, config.JWT_SECRET)
+                return jwt.verify(token, process.env.JWT_SECRET)
             } catch {
                 throw new Error('Invalid token')
             }
@@ -80,7 +79,7 @@ function AuthService() {
                 throw new Error('User email not found')
             }
 
-            if (!config.ADMIN_EMAILS.includes(userEmail)) {
+            if (!process.env.ADMIN_EMAILS.includes(userEmail)) {
                 throw new Error('Admin permission required')
             }
 

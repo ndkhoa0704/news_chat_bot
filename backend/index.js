@@ -3,7 +3,6 @@ import express from "express";
 import helmet from "helmet";
 import mongoose from "mongoose";
 import morgan from "morgan";
-import config from "./config.js";
 import authRouter from "./routes/authRoutes.js";
 import chatRouter from "./routes/chatRoutes.js";
 
@@ -18,14 +17,14 @@ app.use("/api/auth", authRouter);
 app.use("/api/chat", chatRouter);
 
 mongoose
-    .connect(config.MONGO_URL)
+    .connect(process.env.MONGODB_URI)
     .then(() => {
-        app.listen(config.WEB_PORT, (err) => {
+        app.listen(process.env.PORT, (err) => {
             console.log("Connected to MongoDB");
             if (err) {
                 console.log("Error starting the server", err);
             }
-            console.log(`Server is running on port ${config.WEB_PORT}`);
+            console.log(`Server is running on port ${process.env.PORT}`);
         });
     })
     .catch((err) => {
