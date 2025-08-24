@@ -1,10 +1,13 @@
 import cors from "cors";
+import 'dotenv/config'
 import express from "express";
 import helmet from "helmet";
 import mongoose from "mongoose";
 import morgan from "morgan";
 import authRouter from "./routes/authRoutes.js";
 import chatRouter from "./routes/chatRoutes.js";
+import "./scripts/createTables.js";
+
 
 const app = express();
 
