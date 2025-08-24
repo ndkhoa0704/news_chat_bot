@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import { Conversation } from '../models/chatModel.js'
-import chatService from '../services/chatService.js'
+import chatService from '../services/lmService.js'
 import tools from '../tools/index.js'
 
 
